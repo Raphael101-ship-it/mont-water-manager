@@ -24,7 +24,7 @@ export default async function TestConnectionPage() {
 
       <div className="bg-surface rounded-xl border border-border shadow-sm overflow-hidden">
         <ul className="divide-y divide-border">
-          {items?.map((item) => (
+          {items?.map((item: any) => (
             <li key={item.id} className="p-4 hover:bg-background transition-colors flex justify-between items-center">
               <span className="font-medium text-foreground">{item.name}</span>
               <span className="text-sm px-3 py-1 rounded-full bg-primary/10 text-primary font-medium">
