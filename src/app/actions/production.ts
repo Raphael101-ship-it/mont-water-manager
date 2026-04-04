@@ -33,15 +33,14 @@ export async function logProduction(prevState: any, formData: FormData) {
   // 2. Logic for strict "Replace Total" handling
   // If replacing, we must insert a neutralizing OUT movement to mathematically zero the stock exactly
   if (actionType === "replace") {
-    const { data: movements } = await supabase.from("stock_movements").select("quantity, type").eq("item_id", itemId);
+    const { data: rawMovements } = await (supabase.from("stock_movements") as any).select("quantity, type").eq("item_id", itemId);
     let currentStock = 0;
     
-    if (movements) {
-      movements.forEach((m) => {
-        if (m.type === "IN") currentStock += m.quantity;
-        else if (m.type === "OUT") currentStock -= m.quantity;
-      });
-    }
+    const movements: any[] = rawMovements || [];
+    movements.forEach((m) => {
+      if (m.type === "IN") currentStock += m.quantity;
+      else if (m.type === "OUT") currentStock -= m.quantity;
+    });
 
     if (currentStock > 0) {
        await (supabase.from("stock_movements") as any).insert({
