@@ -3,6 +3,7 @@
 import { useActionState, useEffect } from "react";
 import { X, Loader2 } from "lucide-react";
 import { logStockMovement } from "@/app/actions/inventory";
+import { isOffline, saveOfflineData } from "@/components/sync/OfflineSyncProvider";
 import type { ItemWithBalance } from "@/lib/supabase/inventory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +30,19 @@ export function StockModal({
   // Today's date as default for the DatePicker
   const today = new Date().toISOString().split('T')[0];
 
+  const interceptAction = (formData: FormData) => {
+    if (isOffline()) {
+      const rawPayload: Record<string, string> = {};
+      formData.forEach((value, key) => { rawPayload[key] = value.toString() });
+      
+      saveOfflineData("inventory", rawPayload);
+      onClose();
+      return;
+    }
+    
+    formAction(formData);
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="w-full max-w-md bg-surface border border-border shadow-2xl rounded-2xl overflow-hidden animate-in zoom-in-95 duration-200 fade-in">
@@ -48,7 +62,7 @@ export function StockModal({
         </div>
 
         {/* Form Body */}
-        <form action={formAction} className="p-5 space-y-5">
+        <form action={interceptAction} className="p-5 space-y-5">
           <input type="hidden" name="item_id" value={item.id} />
           
           <div className="grid grid-cols-2 gap-4">

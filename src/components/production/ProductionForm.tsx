@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useState, useMemo } from "react";
 import { Loader2, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { logProduction } from "@/app/actions/production";
+import { isOffline, saveOfflineData } from "@/components/sync/OfflineSyncProvider";
 import type { ItemWithBalance } from "@/lib/supabase/inventory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,8 +38,26 @@ export function ProductionForm({ finishedGoods }: { finishedGoods: ItemWithBalan
     }
   }, [state]);
 
+  const interceptAction = (formData: FormData) => {
+    if (isOffline()) {
+      // Package offline submission into JSON and queue it globally!
+      const rawPayload: Record<string, string> = {};
+      formData.forEach((value, key) => { rawPayload[key] = value.toString() });
+      
+      saveOfflineData("production", rawPayload);
+      
+      setQuantity("");
+      setBatchNumber("");
+      setSuccessMsg("System Offline. Production saved locally. (Syncing pending...)");
+      setTimeout(() => setSuccessMsg(""), 4000);
+      return;
+    }
+    
+    formAction(formData);
+  };
+
   return (
-    <form action={formAction} className="p-6 md:p-8 space-y-6">
+    <form action={interceptAction} className="p-6 md:p-8 space-y-6">
       
       {/* Hidden explicit keys */}
       <input type="hidden" name="item_id" value={targetItem?.id || ""} />
