@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { format, differenceInDays } from "date-fns";
-import { getInventoryWithBalances } from "./inventory";
+import { getInventoryWithBalances } from "./supabase/inventory";
 
 export async function getDashboardAnalytics(startDate: Date, endDate: Date) {
   const supabase = await createClient();
@@ -10,11 +10,12 @@ export async function getDashboardAnalytics(startDate: Date, endDate: Date) {
   const toStr = new Date(endDate.setHours(23,59,59,999)).toISOString();
 
   // 1. Fetch Production Data (Bottles Produced)
-  const { data: productionLogs } = await supabase
+  const { data } = await supabase
     .from("production_logs")
     .select("bottle_type, quantity, date")
     .gte("date", fromStr)
     .lte("date", toStr);
+  const productionLogs = data as any[];
 
   const dailyProduction: Record<string, { date: string; "500ml": number; "330ml": number }> = {};
   let totalProduced = 0;
@@ -32,13 +33,14 @@ export async function getDashboardAnalytics(startDate: Date, endDate: Date) {
   const productionChartData = Object.values(dailyProduction).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   // 2. Fetch Raw Material Usage
-  const { data: stockMovements } = await supabase
+  const { data: smData } = await supabase
     .from("stock_movements")
     .select("quantity, date, items(name, category)")
     .eq("type", "OUT")
     .in("reason", ["Production", "Internal Use", "Sales"])
     .gte("date", fromStr)
     .lte("date", toStr);
+  const stockMovements = smData as any[];
 
   const dailyUsage: Record<string, any> = {};
   let totalMaterialsUsed = 0;
