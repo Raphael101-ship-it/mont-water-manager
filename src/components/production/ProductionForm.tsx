@@ -13,6 +13,7 @@ export function ProductionForm({ finishedGoods }: { finishedGoods: ItemWithBalan
   const [selectedType, setSelectedType] = useState<"500ml" | "330ml">("500ml");
   const [quantity, setQuantity] = useState<string>("");
   const [actionType, setActionType] = useState<"add" | "replace">("add");
+  const [batchNumber, setBatchNumber] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
 
   const today = new Date().toISOString().split('T')[0];
@@ -30,6 +31,7 @@ export function ProductionForm({ finishedGoods }: { finishedGoods: ItemWithBalan
   useEffect(() => {
     if (state?.success) {
       setQuantity("");
+      setBatchNumber("");
       setSuccessMsg("Production logged successfully!");
       setTimeout(() => setSuccessMsg(""), 4000);
     }
@@ -85,6 +87,19 @@ export function ProductionForm({ finishedGoods }: { finishedGoods: ItemWithBalan
             onChange={(e) => setQuantity(e.target.value)}
           />
         </div>
+      </div>
+
+      {/* Batch Number */}
+      <div className="space-y-2">
+        <Label htmlFor="batch_number">Batch Number <span className="text-foreground/40 font-normal">(Optional)</span></Label>
+        <Input
+          id="batch_number"
+          name="batch_number"
+          type="text"
+          placeholder="e.g. BATCH-2026-001"
+          value={batchNumber}
+          onChange={(e) => setBatchNumber(e.target.value)}
+        />
       </div>
 
       {/* Dynamic Rollover Warning Interface */}

@@ -12,6 +12,7 @@ export default async function HistoryPage() {
       quantity,
       type,
       reason,
+      batch_number,
       date,
       items (name),
       users (email)
@@ -41,6 +42,7 @@ export default async function HistoryPage() {
                 <th scope="col" className="px-6 py-5 font-semibold tracking-wider text-center">Type</th>
                 <th scope="col" className="px-6 py-5 font-semibold tracking-wider text-right">Quantity</th>
                 <th scope="col" className="px-6 py-5 font-semibold tracking-wider">Reason</th>
+                <th scope="col" className="px-6 py-5 font-semibold tracking-wider">Batch No.</th>
                 <th scope="col" className="px-6 py-5 font-semibold tracking-wider">User Account</th>
               </tr>
             </thead>
@@ -88,6 +90,15 @@ export default async function HistoryPage() {
                       {movement.reason || "-"}
                     </td>
 
+                    {/* Batch Number */}
+                    <td className="px-6 py-4 text-foreground/60 font-mono text-xs">
+                      {movement.batch_number ? (
+                        <span className="px-2 py-1 rounded bg-primary/10 text-primary font-semibold">{movement.batch_number}</span>
+                      ) : (
+                        <span className="italic text-foreground/30">—</span>
+                      )}
+                    </td>
+
                     {/* Auth Integration */}
                     <td className="px-6 py-4 text-foreground/60 text-xs">
                       {movement.users?.email || <span className="italic">System Process</span>}
@@ -98,7 +109,7 @@ export default async function HistoryPage() {
 
               {movements.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-8 py-12 text-center text-foreground/50">
+                  <td colSpan={7} className="px-8 py-12 text-center text-foreground/50">
                     No history logs found. Start logging inventory to populate this audit trail.
                   </td>
                 </tr>

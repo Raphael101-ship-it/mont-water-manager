@@ -12,6 +12,7 @@ export async function logProduction(prevState: any, formData: FormData) {
   const bottleType = formData.get("bottle_type") as "500ml" | "330ml"; 
   const quantity = parseInt(formData.get("quantity") as string, 10);
   const actionType = formData.get("action_type") as "add" | "replace";
+  const batchNumber = formData.get("batch_number") as string | null;
   const dateStr = formData.get("date") as string;
   const date = dateStr ? new Date(dateStr).toISOString() : new Date().toISOString();
 
@@ -25,6 +26,7 @@ export async function logProduction(prevState: any, formData: FormData) {
     quantity,
     date,
     action_type: actionType,
+    batch_number: batchNumber || null,
     user_id: user.id
   });
 
@@ -62,6 +64,7 @@ export async function logProduction(prevState: any, formData: FormData) {
     type: "IN",
     reason: "Production",
     note: `Daily production entry for ${bottleType}`,
+    batch_number: batchNumber || null,
     date,
     user_id: user.id
   });
